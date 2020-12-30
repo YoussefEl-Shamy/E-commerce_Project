@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './screens/registered.dart';
+import './screens/home.dart';
 import './screens/restaurant%20registration.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
@@ -15,7 +15,7 @@ void main() async{
     isRegistered = true;
   }
 
-  runApp(isRegistered? Registered(id): MyApp());
+  runApp(isRegistered? Home(): MyApp());
 }
 
 class MyApp extends StatelessWidget {
