@@ -28,6 +28,7 @@ class CentralData {
   }
 
   static getRestaurants(List<Restaurant> restaurants) async {
+    restaurants.clear();
     final String restaurantUrl =
         "https://e-commerce-project-f189b-default-rtdb.firebaseio.com/restaurant.json";
     try {
@@ -57,67 +58,58 @@ class CentralData {
     }
   }
 
-  static getRestaurantTableOfficial(List<TableModel> tables) {
-    for (int i = 0; i < tables.length; i++) {
-      if (tables[i].availability == false) {
-        switch (tables[i].numOfSeats) {
-          case 1:
+  static getRestaurantTableOfficial(List<TableModel> tables, String id) async {
+    final String tableUrl =
+        "https://e-commerce-project-f189b-default-rtdb.firebaseio.com/Table.json";
+    Image tableImage;
+    try {
+      final http.Response ref = await http.get(tableUrl);
+      final extractedData = json.decode(ref.body) as Map<String, dynamic>;
+      extractedData.forEach((prodId, prodData) {
+        if(prodData['Resturant_id'] == id.toString()){
+
+          if (prodData['Available'] == false) {
+            switch (prodData['Chairs']) {
+              case 1:
+                tableImage = Image.asset("assets/images/tables/not_available_1.jpg");
+                break;
+              case 2:
+                tableImage = Image.asset("assets/images/tables/not_available_2.jpg");
+                break;
+              case 3:
+                tableImage = Image.asset("assets/images/tables/not_available_3.jpg");
+                break;
+              case 4:
+                tableImage = Image.asset("assets/images/tables/not_available_4.jpg");
+                break;
+              case 5:
+                tableImage = Image.asset("assets/images/tables/not_available_5.jpg");
+                break;
+              case 6:
+                tableImage = Image.asset("assets/images/tables/not_available_6.jpg");
+                break;
+            }
+          } else {
+            tableImage = Image.asset("assets/images/tables/available.jpg");
+          }
+
+          tables.add(
             TableModel(
-              index: tables[i].index,
-              numOfSeats: tables[i].numOfSeats,
-              availability: false,
-              tableImage:
-              Image.asset("assets/images/tables/not_available_1.jpg"),
-            );
-            break;
-          case 2:
-            TableModel(
-                index: tables[i].index,
-                numOfSeats: tables[i].numOfSeats,
-                availability: false,
-                tableImage:
-                Image.asset("assets/images/tables/not_available_2.jpg"));
-            break;
-          case 3:
-            TableModel(
-                index: tables[i].index,
-                numOfSeats: tables[i].numOfSeats,
-                availability: false,
-                tableImage:
-                Image.asset("assets/images/tables/not_available_3.jpg"));
-            break;
-          case 4:
-            TableModel(
-                index: tables[i].index,
-                numOfSeats: tables[i].numOfSeats,
-                availability: false,
-                tableImage:
-                Image.asset("assets/images/tables/not_available_4.jpg"));
-            break;
-          case 5:
-            TableModel(
-                index: tables[i].index,
-                numOfSeats: tables[i].numOfSeats,
-                availability: false,
-                tableImage:
-                Image.asset("assets/images/tables/not_available_5.jpg"));
-            break;
-          case 6:
-            TableModel(
-                index: tables[i].index,
-                numOfSeats: tables[i].numOfSeats,
-                availability: false,
-                tableImage:
-                Image.asset("assets/images/tables/not_available_6.jpg"));
-            break;
+              tID: prodId,
+              rID: id,
+              numOfSeats: prodData['Chairs'],
+              index: prodData['index'],
+              availability: prodData['Available'],
+              time: prodData['Time'],
+              date: prodData['Date'],
+              tableImage: tableImage,
+            ),
+          );
+          print(tables[0].numOfSeats);
         }
-      } else {
-        TableModel(
-            index: tables[i].index,
-            numOfSeats: tables[i].numOfSeats,
-            availability: true,
-            tableImage: Image.asset("assets/images/tables/available.jpg"));
-      }
+      });
+    } catch (error) {
+      throw (error);
     }
   }
 
@@ -125,12 +117,14 @@ class CentralData {
     List<TableModel> dummyTables = [];
     for (int i = 0; i < tablesNumber; i++) {
       dummyTables.add(TableModel(
-        index: i+1,
-        id: "MX $i",
+        index: i + 1,
+        rID: "MX $i",
         numOfSeats: 6,
         availability: true,
-        tableImage: Image.asset("assets/images/tables/available.jpg",
-        fit: BoxFit.cover,),
+        tableImage: Image.asset(
+          "assets/images/tables/available.jpg",
+          fit: BoxFit.cover,
+        ),
       ));
     }
     return dummyTables;

@@ -6,6 +6,7 @@ import 'package:vendor_app/widgets/loading.dart';
 import 'package:vendor_app/widgets/main%20drawer.dart';
 import '../widgets/restaurant item.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'dart:async';
 
 class Home extends StatelessWidget {
   @override
@@ -44,19 +45,6 @@ class _RegisteredFulState extends State<RegisteredFul> {
     });
   }
 
-  /*Stream<List<Restaurant>> _timedCounter() async* {
-    /*int _i = 10;
-    while (true) {
-      if (_i < 0) break;
-      await Future.delayed(Duration(seconds: 1));
-      yield List<int>.generate(_i--, (i) => i + 1);*/
-      int i = restaurants.length;
-      while(i < 0) {
-
-      }
-    throw Exception('Mission aborted');
-  }*/
-
   @override
   void initState() {
     print("############%%%%%%%%%@@@@@@@@@@@@@@@@@   initState");
@@ -66,6 +54,7 @@ class _RegisteredFulState extends State<RegisteredFul> {
       });
     } catch (error) {
       print(error);
+      throw(error);
     }
     print("############%%%%%%%%%@@@@@@@@@@@@@@@@@   ${restaurants.length}");
     super.initState();

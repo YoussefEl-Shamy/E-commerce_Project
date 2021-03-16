@@ -16,7 +16,6 @@ import 'package:connectivity/connectivity.dart';
 import 'package:toast/toast.dart';
 import '../widgets/loading.dart';
 import '../central data.dart';
-import 'package:intl/intl.dart';
 
 class _RestaurantRegistrationState extends State<RestaurantRegistration>
     with SingleTickerProviderStateMixin {
@@ -58,6 +57,7 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration>
       print('${_time.toString()}');
       setState(() {
         timesToServe.clear();
+        timesToString.clear();
         for(int i=0; i<10; i++){
           _time = picked;
           newTime = TimeOfDay(hour: _time.hour, minute: _time.minute + i * (minutesToBeAdded));
@@ -76,6 +76,7 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration>
           print("${addedTime.format(ctx)}");
         }
         print(timesToServe);
+        print(timesToString);
       });
     }
   }
@@ -85,6 +86,7 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration>
       print('${_time.toString()}');
       setState(() {
         timesToServe.clear();
+        timesToString.clear();
         for(int i=0; i<10; i++){
           _time = picked;
           newTime = TimeOfDay(hour: _time.hour, minute: _time.minute + i * (minutesToBeAdded));
@@ -94,9 +96,11 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration>
             addedTime = TimeOfDay(hour: addedTime.hour - 24, minute: addedTime.minute);
           }
           timesToServe.add(addedTime);
+          timesToString.add("${addedTime.format(ctx)}");
           print("${addedTime.format(ctx)}");
         }
         print(timesToServe);
+        print(timesToString);
       });
     }
   }
@@ -269,7 +273,7 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration>
 
   @override
   void initState() {
-    print("############%%%%%%%%%@@@@@@@@@@@@@@@@@   initState");
+    print("############%%%%%%%%%@@@@@@@@@@@@@@@@@  getting categories   initState");
     CentralData.getCategories(foodCategories).then((_) {
       setState(() {
         _isFetching = false;
@@ -296,21 +300,6 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration>
     animationController.addListener(() {
       setState(() {});
     });
-
-    /*final String categoryUrl =
-        "https://e-commerce-project-f189b-default-rtdb.firebaseio.com/category.json";
-    http.post(
-      categoryUrl,
-      body: json.encode({
-        'Sea food': "Sea food",
-        'Barbecue': "Barbecue",
-        'Vegan': "Vegan",
-        'Fast food': "Fast food",
-        'Pastries': "Pastries",
-        'Desserts': "Desserts",
-        'Fried Chicken': "Fried Chicken",
-      }),
-    );*/
   }
 
   int initVal = 10;
@@ -491,7 +480,7 @@ class _RestaurantRegistrationState extends State<RestaurantRegistration>
                                             (int value) {
                                           return DropdownMenuItem<int>(
                                             value: value,
-                                            child: Text("$value"),
+                                            child: Text("$value   min"),
                                           );
                                         }).toList(),
                                   ),

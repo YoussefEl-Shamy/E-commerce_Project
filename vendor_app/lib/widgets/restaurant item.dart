@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:vendor_app/models/restaurant%20model.dart';
 import 'package:http/http.dart' as http;
@@ -28,21 +29,75 @@ class RestaurantItem extends StatelessWidget {
     this.rList,
   });
 
-  selectRestaurant(BuildContext ctx) {
-    Navigator.of(ctx).push(MaterialPageRoute(builder: (_) {
-      return TablesScreen(
-        id: id,
-        tablesNumber: tablesNumber,
-        rName: name,
-      );
-    }));
+  int timeSlot = 0;
+
+  List<String> timeSlotsList = [];
+
+  getTimeSlots(String id) async{
+    final String restaurantUrl =
+        "https://e-commerce-project-f189b-default-rtdb.firebaseio.com/restaurant.json";
+    try {
+      final http.Response ref = await http.get(restaurantUrl);
+      final extractedData = json.decode(ref.body) as Map<String, dynamic>;
+      extractedData.forEach((prodId, prodData) {
+        if(prodId == id){
+          for(int i = 0; i < 10; i++){
+            timeSlotsList.add(prodData['timeSlotsList'][i].toString());
+          }
+        }
+      });
+    } catch(error){
+      print("H%A");
+      throw (error);
+    }
+  }
+
+  bool minutesIsMinus = false;
+  timeDifference(TimeOfDay ft, TimeOfDay st){
+    int minutes = 0;
+    if(st.minute - ft.minute < 0){
+      minutesIsMinus = true;
+      minutes = ft.minute - st.minute;
+    } else {
+      minutes = st.minute - ft.minute;
+    }
+    TimeOfDay newTime = st.replacing(
+        hour: st.hour - ft.hour,
+        minute: minutes,
+    );
+    timeSlot = minutesIsMinus? newTime.hour * 60 - newTime.minute : newTime.hour * 60 + newTime.minute;
+    print("TIME SLOT AHE: $timeSlot");
+    minutesIsMinus = false;
+    print(timeSlot);
+  }
+
+  selectRestaurant(BuildContext ctx, String id) {
+    getTimeSlots(id).then((_){
+      print("h5a 1");
+      TimeOfDay firstTime = TimeOfDay(hour:int.parse(timeSlotsList[0].split(":")[0]),minute: int.parse(timeSlotsList[0].split(":")[1].substring(0, 2)));
+      print(firstTime.format(ctx));
+      TimeOfDay secondTime = TimeOfDay(hour:int.parse(timeSlotsList[1].split(":")[0]),minute: int.parse(timeSlotsList[1].split(":")[1].substring(0, 2)));
+      print(secondTime.format(ctx));
+      timeDifference(firstTime, secondTime);
+      Navigator.of(ctx).push(MaterialPageRoute(builder: (_) {
+        print("Time Slot Before send it to tables screen: $timeSlot");
+        return TablesScreen(
+          id: id,
+          tablesNumber: tablesNumber,
+          rName: name,
+          timeSlot: timeSlot,
+          timeSlotsList: timeSlotsList,
+          dateTime_now: DateTime.now(),
+        );
+      }));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: (){
-        selectRestaurant(context);
+        selectRestaurant(context, id);
       },
       child: Card(
         shape: RoundedRectangleBorder(
@@ -135,7 +190,7 @@ class RestaurantItem extends StatelessWidget {
                           ),
                         ),
                         onTap: () {
-                          selectRestaurant(context);
+                          selectRestaurant(context, id);
                         },
                       ),
                       InkWell(
